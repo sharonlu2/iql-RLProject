@@ -9,6 +9,7 @@ jax <= 0.2.21  # Freeze until tensorflow probability supports the most recent ve
 ml_collections >= 0.1.0
 optax >= 0.0.6
 tensorboardX == 2.1
+protobuf <= 3.20.3
 tensorflow-probability >= 0.14.1
 imageio >= 2.9.0
 imageio-ffmpeg >= 0.4.3

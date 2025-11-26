@@ -24,6 +24,9 @@ pip install --upgrade pip
 
 pip install -r requirements.txt
 
+# Pin protobuf for tensorboardX compatibility.
+pip install "protobuf<=3.20.3"
+
 # Installs the wheel compatible with Cuda 11 and cudnn 8.
 pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
