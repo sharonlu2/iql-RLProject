@@ -24,6 +24,9 @@ pip install --upgrade pip
 
 pip install -r requirements.txt
 
+# Ensure Minari is available to load datasets from Hugging Face.
+pip show minari || pip install "minari==0.5.3"
+
 # Pin protobuf for tensorboardX compatibility.
 pip install "protobuf<=3.20.3"
 
@@ -78,6 +81,8 @@ python train_finetune.py --env_name=antmaze-large-play-v0 --config=configs/antma
    !sudo apt-get update && sudo apt-get install -y patchelf
    !pip install --upgrade pip
    !pip install -r requirements.txt
+   # Ensure Minari installed (needed to load datasets hosted via Hugging Face)
+   !pip show minari || pip install "minari==0.5.3"
    # Match CUDA on Colab (usually 11.x) for JAX. CUDA wheels for jaxlib 0.4.38
    # are available for common CUDA versions on Python 3.10–3.12; if pip cannot
    # find a matching CUDA wheel, fall back to the CPU wheel shown here.

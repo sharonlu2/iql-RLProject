@@ -1,13 +1,21 @@
 import os
 from typing import Tuple
 
+import importlib.util
 import gymnasium as gym
-import minari
 import numpy as np
 import tqdm
 from absl import app, flags
 from ml_collections import config_flags
 from tensorboardX import SummaryWriter
+
+if importlib.util.find_spec('minari') is None:
+    raise ImportError(
+        "Minari is required to load datasets. Install it via `pip install \"minari==0.5.3\"` "
+        "and ensure authentication for private Hugging Face datasets if needed."
+    )
+
+import minari
 
 import wrappers
 from dataset_utils import (Batch, MinariDataset, ReplayBuffer,
