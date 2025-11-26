@@ -52,5 +52,35 @@ Finetuning on AntMaze tasks
 python train_finetune.py --env_name=antmaze-large-play-v0 --config=configs/antmaze_finetune_config.py --eval_episodes=100 --eval_interval=100000 --replay_buffer_size 2000000
 ```
 
+### Run on Google Colab
+
+1. **Start a GPU runtime** in Colab (Runtime → Change runtime type → Hardware accelerator → GPU).
+2. **Clone the branch you want to test** (replace `<BRANCH>` and `<FORK_OWNER>` as needed):
+   ```bash
+   !git clone -b <BRANCH> https://github.com/<FORK_OWNER>/iql-RLProject.git
+   %cd iql-RLProject
+   ```
+3. **Install system and Python dependencies** (Colab supports `sudo`):
+   ```bash
+   !sudo apt-get update && sudo apt-get install -y patchelf
+   !pip install --upgrade pip
+   !pip install -r requirements.txt
+   # Match CUDA on Colab (usually 11.x) for JAX; adjust the CUDA tag if Google updates the runtime.
+   !pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+   ```
+4. **(If required) authenticate with Hugging Face to download Minari datasets**:
+   ```bash
+   !huggingface-cli login --token <YOUR_HF_TOKEN>
+   ```
+5. **Run training/evaluation commands** exactly as shown above (for example):
+   ```bash
+   !python train_offline.py --env_name=halfcheetah-medium-expert-v2 --config=configs/mujoco_config.py
+   ```
+6. (Optional) **Persist outputs** by mounting Google Drive before running commands:
+   ```bash
+   from google.colab import drive
+   drive.mount('/content/drive')
+   ```
+
 ## Misc
 The implementation is based on [JAXRL](https://github.com/ikostrikov/jaxrl).
