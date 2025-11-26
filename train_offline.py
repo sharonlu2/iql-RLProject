@@ -1,7 +1,8 @@
 import os
 from typing import Tuple
 
-import gym
+import gymnasium as gym
+import minari
 import numpy as np
 import tqdm
 from absl import app, flags
@@ -9,7 +10,7 @@ from ml_collections import config_flags
 from tensorboardX import SummaryWriter
 
 import wrappers
-from dataset_utils import D4RLDataset, split_into_trajectories
+from dataset_utils import MinariDataset, split_into_trajectories
 from evaluation import evaluate
 from learner import Learner
 
@@ -53,17 +54,18 @@ def normalize(dataset):
 
 
 def make_env_and_dataset(env_name: str,
-                         seed: int) -> Tuple[gym.Env, D4RLDataset]:
-    env = gym.make(env_name)
+                         seed: int) -> Tuple[gym.Env, MinariDataset]:
+    minari_dataset = minari.load_dataset(env_name)
+    env = minari_dataset.recover_environment()
 
     env = wrappers.EpisodeMonitor(env)
     env = wrappers.SinglePrecision(env)
 
-    env.seed(seed)
+    env.reset(seed=seed)
     env.action_space.seed(seed)
     env.observation_space.seed(seed)
 
-    dataset = D4RLDataset(env)
+    dataset = MinariDataset(minari_dataset)
 
     if 'antmaze' in FLAGS.env_name:
         dataset.rewards -= 1.0

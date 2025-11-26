@@ -1,8 +1,8 @@
 import collections
 from typing import Optional
 
-import d4rl
-import gym
+import gymnasium as gym
+import minari
 import numpy as np
 from tqdm import tqdm
 
@@ -68,37 +68,55 @@ class Dataset(object):
                      next_observations=self.next_observations[indx])
 
 
-class D4RLDataset(Dataset):
+class MinariDataset(Dataset):
     def __init__(self,
-                 env: gym.Env,
+                 dataset: minari.MinariDataset,
                  clip_to_eps: bool = True,
                  eps: float = 1e-5):
-        dataset = d4rl.qlearning_dataset(env)
+        trajs = dataset.recover_episodes()
+
+        observations = []
+        actions = []
+        rewards = []
+        masks = []
+        dones_float = []
+        next_observations = []
+
+        for traj in trajs:
+            obs = np.asarray(traj.observations)
+            act = np.asarray(traj.actions)
+            rew = np.asarray(traj.rewards)
+            terminations = np.asarray(traj.terminations)
+            truncations = np.asarray(traj.truncations)
+
+            for i in range(len(act)):
+                observations.append(obs[i])
+                actions.append(act[i])
+                rewards.append(rew[i])
+
+                done = float(terminations[i] or truncations[i])
+                dones_float.append(done)
+                masks.append(1.0 - done)
+                next_observations.append(obs[i + 1])
+
+        observations = np.stack(observations).astype(np.float32)
+        actions = np.stack(actions).astype(np.float32)
+        rewards = np.stack(rewards).astype(np.float32)
+        masks = np.stack(masks).astype(np.float32)
+        dones_float = np.stack(dones_float).astype(np.float32)
+        next_observations = np.stack(next_observations).astype(np.float32)
 
         if clip_to_eps:
             lim = 1 - eps
-            dataset['actions'] = np.clip(dataset['actions'], -lim, lim)
+            actions = np.clip(actions, -lim, lim)
 
-        dones_float = np.zeros_like(dataset['rewards'])
-
-        for i in range(len(dones_float) - 1):
-            if np.linalg.norm(dataset['observations'][i + 1] -
-                              dataset['next_observations'][i]
-                              ) > 1e-6 or dataset['terminals'][i] == 1.0:
-                dones_float[i] = 1
-            else:
-                dones_float[i] = 0
-
-        dones_float[-1] = 1
-
-        super().__init__(dataset['observations'].astype(np.float32),
-                         actions=dataset['actions'].astype(np.float32),
-                         rewards=dataset['rewards'].astype(np.float32),
-                         masks=1.0 - dataset['terminals'].astype(np.float32),
-                         dones_float=dones_float.astype(np.float32),
-                         next_observations=dataset['next_observations'].astype(
-                             np.float32),
-                         size=len(dataset['observations']))
+        super().__init__(observations=observations,
+                         actions=actions,
+                         rewards=rewards,
+                         masks=masks,
+                         dones_float=dones_float,
+                         next_observations=next_observations,
+                         size=len(observations))
 
 
 class ReplayBuffer(Dataset):

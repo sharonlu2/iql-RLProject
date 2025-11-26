@@ -17,6 +17,8 @@ If you use this code for your research, please consider citing the paper:
 
 ### Install dependencies
 
+The datasets are hosted via [Minari](https://github.com/Farama-Foundation/Minari). Ensure you can download datasets from Hugging Face (see the Minari README for authentication details if needed).
+
 ```bash
 pip install --upgrade pip
 
