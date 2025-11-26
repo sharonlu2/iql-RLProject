@@ -1,6 +1,6 @@
 import time
 
-import gym
+import gymnasium as gym
 import numpy as np
 
 from wrappers.common import TimeStep
@@ -19,7 +19,13 @@ class EpisodeMonitor(gym.ActionWrapper):
         self.start_time = time.time()
 
     def step(self, action: np.ndarray) -> TimeStep:
-        observation, reward, done, info = self.env.step(action)
+        result = self.env.step(action)
+
+        if len(result) == 5:
+            observation, reward, terminated, truncated, info = result
+            done = terminated or truncated
+        else:
+            observation, reward, done, info = result
 
         self.reward_sum += reward
         self.episode_length += 1
@@ -38,6 +44,13 @@ class EpisodeMonitor(gym.ActionWrapper):
 
         return observation, reward, done, info
 
-    def reset(self) -> np.ndarray:
+    def reset(self, *args, **kwargs) -> np.ndarray:
         self._reset_stats()
-        return self.env.reset()
+        result = self.env.reset(*args, **kwargs)
+
+        if isinstance(result, tuple) and len(result) == 2:
+            observation, _ = result
+        else:
+            observation = result
+
+        return observation
