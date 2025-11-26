@@ -24,9 +24,25 @@ pip install --upgrade pip
 
 pip install -r requirements.txt
 
-# Installs the wheel compatible with Cuda 11 and cudnn 8.
-pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+# Ensure Minari is available to load datasets from Hugging Face.
+pip show minari || pip install "minari==0.5.3"
+
+# Pin protobuf for tensorboardX compatibility.
+pip install "protobuf<=3.20.3"
+
+# Remove any preinstalled JAX packages (Colab often ships newer nightly builds
+# that are incompatible with this repository's pinned stack).
+pip uninstall -y jax jaxlib
+
+# Install a JAX/JAXLIB pair that has wheels for Python 3.12 and matches modern
+# Flax/Optax releases.
+pip install "jax==0.4.38"
+pip install "jaxlib==0.4.38"  # CPU-only; see JAX release notes for CUDA wheels
 ```
+
+If you see errors such as `ImportError: cannot import name 'linear_util' from 'jax'` or warnings about `jax_cuda12_plugin` being
+ignored, it means a conflicting JAX/JAXLIB build was preinstalled. Re-running the uninstall/install commands above ensures Flax
+and JAX are aligned on a compatible, wheel-available version.
 
 Also, see other configurations for CUDA [here](https://github.com/google/jax#pip-installation-gpu-cuda).
 
@@ -65,8 +81,14 @@ python train_finetune.py --env_name=antmaze-large-play-v0 --config=configs/antma
    !sudo apt-get update && sudo apt-get install -y patchelf
    !pip install --upgrade pip
    !pip install -r requirements.txt
-   # Match CUDA on Colab (usually 11.x) for JAX; adjust the CUDA tag if Google updates the runtime.
-   !pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+   # Ensure Minari installed (needed to load datasets hosted via Hugging Face)
+   !pip show minari || pip install "minari==0.5.3"
+   # Match CUDA on Colab (usually 11.x) for JAX. CUDA wheels for jaxlib 0.4.38
+   # are available for common CUDA versions on Python 3.10–3.12; if pip cannot
+   # find a matching CUDA wheel, fall back to the CPU wheel shown here.
+   !pip uninstall -y jax jaxlib
+   !pip install "jax==0.4.38"
+   !pip install "jaxlib==0.4.38"  # CPU-only; see JAX release notes for CUDA wheels
    ```
 4. **(If required) authenticate with Hugging Face to download Minari datasets**:
    ```bash

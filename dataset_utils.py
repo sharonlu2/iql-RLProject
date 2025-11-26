@@ -1,10 +1,18 @@
 import collections
+import importlib.util
 from typing import Optional
 
 import gymnasium as gym
-import minari
 import numpy as np
 from tqdm import tqdm
+
+if importlib.util.find_spec('minari') is None:
+    raise ImportError(
+        "Minari is required to build datasets. Install it via `pip install \"minari==0.5.3\"` "
+        "and ensure authentication for private Hugging Face datasets if needed."
+    )
+
+import minari
 
 Batch = collections.namedtuple(
     'Batch',
