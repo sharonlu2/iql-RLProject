@@ -5,7 +5,8 @@ gymnasium[mujoco] >= 0.29.0
 gdown >= 3.12.2
 tqdm >= 4.60.0
 flax >= 0.3.5
-jax <= 0.2.21  # Freeze until tensorflow probability supports the most recent version of jax.
+jax == 0.2.21  # Freeze until tensorflow probability supports the most recent version of jax.
+jaxlib == 0.1.71
 ml_collections >= 0.1.0
 optax >= 0.0.6
 tensorboardX == 2.1

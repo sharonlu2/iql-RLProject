@@ -27,9 +27,18 @@ pip install -r requirements.txt
 # Pin protobuf for tensorboardX compatibility.
 pip install "protobuf<=3.20.3"
 
-# Installs the wheel compatible with Cuda 11 and cudnn 8.
-pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+# Remove any newer Colab-installed JAX packages that conflict with Flax 0.3.x.
+pip uninstall -y jax jaxlib
+
+# Install JAX/JAXLIB versions compatible with this codebase and Flax 0.3.x.
+# For CPU-only, omit the CUDA tag; for GPU on Colab (CUDA 11.x), keep +cuda111.
+pip install "jax==0.2.21"
+pip install "jaxlib==0.1.71+cuda111" -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
+
+If you see errors such as `ImportError: cannot import name 'linear_util' from 'jax'` or warnings about `jax_cuda12_plugin` being
+ignored, it means a newer JAX/JAXLIB was preinstalled. Re-running the uninstall/install commands above ensures Flax 0.3.x and
+JAX 0.2.21 are used together.
 
 Also, see other configurations for CUDA [here](https://github.com/google/jax#pip-installation-gpu-cuda).
 
@@ -69,7 +78,9 @@ python train_finetune.py --env_name=antmaze-large-play-v0 --config=configs/antma
    !pip install --upgrade pip
    !pip install -r requirements.txt
    # Match CUDA on Colab (usually 11.x) for JAX; adjust the CUDA tag if Google updates the runtime.
-   !pip install "jax[cuda111]<=0.21.1" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+   !pip uninstall -y jax jaxlib
+   !pip install "jax==0.2.21"
+   !pip install "jaxlib==0.1.71+cuda111" -f https://storage.googleapis.com/jax-releases/jax_releases.html
    ```
 4. **(If required) authenticate with Hugging Face to download Minari datasets**:
    ```bash
