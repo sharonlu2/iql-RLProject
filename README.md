@@ -27,20 +27,19 @@ pip install -r requirements.txt
 # Pin protobuf for tensorboardX compatibility.
 pip install "protobuf<=3.20.3"
 
-# Remove any newer Colab-installed JAX packages that conflict with Flax 0.3.x.
+# Remove any preinstalled JAX packages (Colab often ships newer nightly builds
+# that are incompatible with this repository's pinned stack).
 pip uninstall -y jax jaxlib
 
-# Install JAX/JAXLIB versions compatible with this codebase and Flax 0.3.x.
-# The CPU wheel is published on PyPI; CUDA wheels live on the JAX releases index
-# but are not available for every Python version. If the CUDA tag is missing for
-# your Python/CUDA combo (common on Python 3.12), stick with the CPU wheel.
-pip install "jax==0.2.21"
-pip install "jaxlib==0.1.71"  # CPU-only; see JAX release notes for CUDA wheels
+# Install a JAX/JAXLIB pair that has wheels for Python 3.12 and matches modern
+# Flax/Optax releases.
+pip install "jax==0.4.38"
+pip install "jaxlib==0.4.38"  # CPU-only; see JAX release notes for CUDA wheels
 ```
 
 If you see errors such as `ImportError: cannot import name 'linear_util' from 'jax'` or warnings about `jax_cuda12_plugin` being
-ignored, it means a newer JAX/JAXLIB was preinstalled. Re-running the uninstall/install commands above ensures Flax 0.3.x and
-JAX 0.2.21 are used together.
+ignored, it means a conflicting JAX/JAXLIB build was preinstalled. Re-running the uninstall/install commands above ensures Flax
+and JAX are aligned on a compatible, wheel-available version.
 
 Also, see other configurations for CUDA [here](https://github.com/google/jax#pip-installation-gpu-cuda).
 
@@ -79,12 +78,12 @@ python train_finetune.py --env_name=antmaze-large-play-v0 --config=configs/antma
    !sudo apt-get update && sudo apt-get install -y patchelf
    !pip install --upgrade pip
    !pip install -r requirements.txt
-   # Match CUDA on Colab (usually 11.x) for JAX. CUDA wheels for jaxlib 0.1.71
-   # are only built for older Python versions; if pip cannot find a matching
-   # CUDA wheel, fall back to the CPU wheel shown here.
+   # Match CUDA on Colab (usually 11.x) for JAX. CUDA wheels for jaxlib 0.4.38
+   # are available for common CUDA versions on Python 3.10–3.12; if pip cannot
+   # find a matching CUDA wheel, fall back to the CPU wheel shown here.
    !pip uninstall -y jax jaxlib
-   !pip install "jax==0.2.21"
-   !pip install "jaxlib==0.1.71"  # CPU-only; see JAX release notes for CUDA wheels
+   !pip install "jax==0.4.38"
+   !pip install "jaxlib==0.4.38"  # CPU-only; see JAX release notes for CUDA wheels
    ```
 4. **(If required) authenticate with Hugging Face to download Minari datasets**:
    ```bash
